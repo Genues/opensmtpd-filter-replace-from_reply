@@ -29,8 +29,6 @@ func main() {
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		log.Println(line)
-
 		if strings.HasPrefix(line, "config|ready") {
 			fmt.Println("register|filter|smtp-in|data-line")
 			fmt.Println("register|filter|smtp-in|mail-from")
@@ -40,7 +38,6 @@ func main() {
 			if len(dataSplit) >= 8 {
 				switch dataSplit[4] {
 					case "mail-from" :
-						log.Printf("filter-result|%s|rewrite|%s\n", strings.Join(dataSplit[5:7], "|"), "<"+mailFrom+">")
 						fmt.Printf("filter-result|%s|rewrite|%s\n", strings.Join(dataSplit[5:7], "|"), "<"+mailFrom+">")
 					break;
 					case "data-line":
@@ -51,13 +48,10 @@ func main() {
 								if (len(from) >= 2){
 									dataSplit[7] = "Reply-To: "+from[1]
 									fmt.Printf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
-									//log.Printf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
 								}
 							}
-							//re := regexp.MustCompile(`(?i)FROM:[\s]*[\S]+`);
 							dataSplit[7] = "From: <"+mailFrom+">"
 							fmt.Printf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
-							//log.Printf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
 						}else{
 							fmt.Printf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
 						}
