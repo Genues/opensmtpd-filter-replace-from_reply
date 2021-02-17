@@ -57,8 +57,6 @@ func main() {
 						}
 					break;
 				}
-			}else{
-				log.Println("Fail read dataline: ", len(dataSplit), dataSplit)
 			}
 		}
 	}
