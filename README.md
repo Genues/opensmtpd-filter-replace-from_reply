@@ -7,6 +7,8 @@ This is a simple OpenSMTPD filter for overwriting the email address in the MAIL 
 ## Usage
 * build the filter for your target platform  
 `env GOOS=linux GOARCH=amd64 go build opensmtpd-filter-replace-from_reply.go`
+
+or for ArchLinux AUR package - <a href="https://aur.archlinux.org/packages/opensmtpd-filter-replace-from_reply">opensmtpd-filter-replace-from_reply</a>
 * make OpenSMTPD use the filter
 ```
 filter "replace-from_reply" proc-exec "opensmtpd-filter-replace-from_reply --mailFrom=no-reply@example.ru --fromToReply=true"
