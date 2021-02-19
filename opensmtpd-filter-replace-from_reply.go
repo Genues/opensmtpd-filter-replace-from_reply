@@ -7,11 +7,11 @@ import (
 	"log"
 	"os"
 	"strings"
-	"regexp"
 )
 
 var mailFrom string
 var fromToReply bool
+var needReplace bool = true
 
 func init() {
 	flag.StringVar(&mailFrom, "mailFrom", "", "Email for rewrite")
@@ -39,19 +39,20 @@ func main() {
 				switch dataSplit[4] {
 					case "mail-from" :
 						fmt.Printf("filter-result|%s|rewrite|%s\n", strings.Join(dataSplit[5:7], "|"), "<"+mailFrom+">")
+						needReplace = true
 					break;
 					case "data-line":
-						if strings.HasPrefix(strings.ToUpper(dataSplit[7]), "FROM: "){
-							re := regexp.MustCompile(`(?i)From:[\s]*([\S]+)`);
+						if needReplace && strings.HasPrefix(strings.ToUpper(dataSplit[7]), "FROM:"){
 							if (fromToReply){
-								var from = re.FindStringSubmatch(dataSplit[7]);
-								if (len(from) >= 2){
-									dataSplit[7] = "Reply-To: "+from[1]
+								var from = strings.TrimSpace(dataSplit[7][5:]);
+								if (from != ""){
+									dataSplit[7] = "Reply-To: "+from
 									fmt.Printf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
 								}
 							}
 							dataSplit[7] = "From: <"+mailFrom+">"
 							fmt.Printf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
+							needReplace = false
 						}else{
 							fmt.Printf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
 						}
