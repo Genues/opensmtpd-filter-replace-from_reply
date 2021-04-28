@@ -15,7 +15,7 @@ var needReplace bool = true
 
 func init() {
 	flag.StringVar(&mailFrom, "mailFrom", "", "Email for rewrite")
-	flag.BoolVar(&fromToReply, "fromToReply", true, "Move mail from addres to Reply-To field")
+	flag.BoolVar(&fromToReply, "fromToReply", true, "Move mail from address to Reply-To field")
 	flag.Parse()
 }
 
@@ -43,15 +43,13 @@ func main() {
 					break;
 					case "data-line":
 						if needReplace && strings.HasPrefix(strings.ToUpper(dataSplit[7]), "FROM:"){
-							if (fromToReply){
-								var from = strings.TrimSpace(dataSplit[7][5:]);
-								if (from != ""){
-									dataSplit[7] = "Reply-To: "+from
-									fmt.Printf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
-								}
-							}
+							var from = strings.TrimSpace(dataSplit[7][5:]);
 							dataSplit[7] = "From: <"+mailFrom+">"
 							fmt.Printf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
+							if (fromToReply && from != ""){
+								dataSplit[7] = "Reply-To: "+from
+								fmt.Printf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
+							}
 							needReplace = false
 						}else{
 							fmt.Printf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
