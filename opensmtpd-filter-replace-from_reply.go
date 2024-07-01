@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"net/mail"
 )
 
 var mailFrom string
@@ -46,7 +47,7 @@ func main() {
 							var from = strings.TrimSpace(dataSplit[7][5:]);
 							dataSplit[7] = "From: <"+mailFrom+">"
 							fmt.Printf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
-							if (fromToReply && from != ""){
+							if (fromToReply && from != "" && valid(from)){
 								dataSplit[7] = "Reply-To: "+from
 								fmt.Printf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
 							}
@@ -63,4 +64,9 @@ func main() {
 	if err := scanner.Err(); err != nil {
 		log.Println(err)
 	}
+}
+
+func valid(email string) bool {
+    _, err := mail.ParseAddress(email)
+    return err == nil
 }
