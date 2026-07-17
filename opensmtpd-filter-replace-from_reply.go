@@ -61,7 +61,11 @@ func main() {
 					case "data-line":
 						if strings.HasPrefix(strings.ToUpper(dataSplit[7]), "FROM:"){
 							var from = strings.TrimSpace(dataSplit[7][5:]);
-							dataSplit[7] = "From: "+mailSender+" <"+mailFrom+">"
+							dataSplit[7] = "From:"
+							if mailSender != "" {
+								dataSplit[7] += " "+mailSender
+							}
+							dataSplit[7] += " <"+mailFrom+">"
 							out := fmt.Sprintf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
 							if debug > 0 {
 								log.Printf("[1] %s", out)
