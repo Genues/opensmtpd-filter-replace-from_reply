@@ -30,8 +30,6 @@ func main() {
 		return
 	}
 
-	skip := false
-
 	for scanner.Scan() {
 		line := scanner.Text()
 		if debug > 3 {
@@ -59,32 +57,24 @@ func main() {
 						fmt.Print(out)
 					break;
 					case "data-line":
+						var from = ""
 						if strings.HasPrefix(strings.ToUpper(dataSplit[7]), "FROM:"){
-							var from = strings.TrimSpace(dataSplit[7][5:]);
+							from = strings.TrimSpace(dataSplit[7][5:]);
 							dataSplit[7] = "From:"
 							if mailSender != "" {
 								dataSplit[7] += " "+mailSender
 							}
 							dataSplit[7] += " <"+mailFrom+">"
+						}
+						out := fmt.Sprintf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
+						if debug > 0 {
+							log.Printf("[1] %s", out)
+						}
+						fmt.Print(out);
+						if fromToReply && from != "" && from != "" && valid(from) {
+							dataSplit[7] = "Reply-To: "+from
 							out := fmt.Sprintf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
 							if debug > 0 {
-								log.Printf("[1] %s", out)
-							}
-							fmt.Print(out);
-							if fromToReply && from != "" && valid(from) {
-								dataSplit[7] = "Reply-To: "+from
-								out := fmt.Sprintf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
-								if debug > 0 {
-									log.Printf("[1] %s", out)
-								}
-								fmt.Print(out)
-							}
-							skip = true
-						}else if strings.HasPrefix(strings.ToUpper(dataSplit[7]), "TO:") {
-							skip = false
-						}else if !skip {
-							out := fmt.Sprintf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
-							if debug > 1 {
 								log.Printf("[1] %s", out)
 							}
 							fmt.Print(out)
@@ -101,6 +91,6 @@ func main() {
 }
 
 func valid(email string) bool {
-    _, err := mail.ParseAddress(email)
-    return err == nil
+	_, err := mail.ParseAddress(email)
+	return err == nil
 }
