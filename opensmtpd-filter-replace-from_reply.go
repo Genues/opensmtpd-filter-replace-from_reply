@@ -24,6 +24,7 @@ func init() {
 }
 
 func main() {
+	isFrom := false
 	scanner := bufio.NewScanner(os.Stdin)
 	if (mailFrom == ""){
 		log.Println("Not set email address for rewrite")
@@ -57,6 +58,16 @@ func main() {
 						fmt.Print(out)
 					break;
 					case "data-line":
+						if isFrom {
+							if strings.Contains(dataSplit[7], ":") {
+								isFrom = false
+							}else{
+								if debug > 0 {
+									log.Printf("[1] SKIP %s", dataSplit[7])
+								}
+								continue
+							}
+						}
 						var from = ""
 						if strings.HasPrefix(strings.ToUpper(dataSplit[7]), "FROM:"){
 							from = strings.TrimSpace(dataSplit[7][5:]);
@@ -65,13 +76,14 @@ func main() {
 								dataSplit[7] += " "+mailSender
 							}
 							dataSplit[7] += " <"+mailFrom+">"
+							isFrom = true
 						}
 						out := fmt.Sprintf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
 						if debug > 0 {
 							log.Printf("[1] %s", out)
 						}
 						fmt.Print(out);
-						if fromToReply && from != "" && from != "" && valid(from) {
+						if fromToReply && from != "" && valid(from) {
 							dataSplit[7] = "Reply-To: "+from
 							out := fmt.Sprintf("filter-dataline|%s\n", strings.Join(dataSplit[5:], "|"))
 							if debug > 0 {
